@@ -8,5 +8,5 @@
   "reference_text": "大家好，今天想跟大家简单聊聊一个实际问题。",
   "baocut_bin": "",
   "terms_file": "",
-  "notes": "把空字符串填成本机绝对路径；也可用环境变量 TTH_QWEN_PYTHON / TTH_QWEN_MODEL / TTH_REFERENCE_AUDIO / TTH_BAOCUT / TTH_SPEAKER / TTH_REVIEWER 覆盖。"
+  "notes": "reference_text 必须与 reference_audio 实际说的全文一字不差（可先用 ASR 听写），否则克隆会复读。把空字符串填成本机绝对路径；也可用环境变量 TTH_QWEN_PYTHON / TTH_QWEN_MODEL / TTH_REFERENCE_AUDIO / TTH_BAOCUT / TTH_SPEAKER / TTH_REVIEWER 覆盖。"
 }

@@ -14,6 +14,20 @@
 
 > 技术演示，不代表人工嘴型听审已通过。
 
+## 数字人怎么接？（必读）
+
+别人用本包最容易翻车的点：**不知道哪个阶段该接哪个数字人**。
+
+- 路由表：[`video-director/references/digital-human-routing.md`](video-director/references/digital-human-routing.md)
+- 翻车自查：[`video-director/references/TROUBLESHOOTING.md`](video-director/references/TROUBLESHOOTING.md)
+- 开工体检：
+
+```bash
+python3 video-director/scripts/doctor.py
+```
+
+一句话：**脸的效果取决于你接的模型；本 skill 管对齐、门禁和可追溯。** 无 HeyGen / 授权形象时用 PIP 占位，不要硬凑，也不要在交付说明里假装生成过数字人。
+
 ## 一键安装
 
 ```bash

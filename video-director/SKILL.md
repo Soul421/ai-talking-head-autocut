@@ -12,6 +12,17 @@ description: End-to-end AI video director for turning a user's natural-language 
 - 只有 `video-handoff.json` 为 `ready` 且已批准音频 hash 匹配，才进入 `video-script`、数字人、HyperFrames 或最终剪辑。
 - 正文、声音、语速、剪裁或拼接一旦变化，返回声音工作室重新验收；不得沿用旧字幕时间轴。
 
+## 数字人接入（出脸前必读）
+
+**禁止凭感觉选数字人。** 每次进入出脸/合成前必须：
+
+1. 运行 `python3 scripts/doctor.py --stage s4` 做开工体检；
+2. 按 [references/digital-human-routing.md](references/digital-human-routing.md) 的阶段表与决策树选择 HeyGen / D-ID / 开源 / PIP 占位；
+3. 在 `asset-plan` 写明 provider、时长约束与授权责任；
+4. 效果异常先查 [references/TROUBLESHOOTING.md](references/TROUBLESHOOTING.md)，禁止用画面掩盖门禁问题。
+
+无 API Key / 无授权形象时：只允许 `--show-pip-placeholder` 或用户已导出的成片，**不得伪造「已生成数字人」**。脸的效果取决于所接模型；本 skill 只保证音画对齐、门禁与可追溯。
+
 Act as the user's video director and production coordinator. The user should be
 able to speak in ordinary language. Translate their intent into professional
 production decisions internally; do not require them to know terms such as

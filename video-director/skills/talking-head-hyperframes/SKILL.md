@@ -28,10 +28,17 @@ description: 为 HyperFrames 口播或旁白项目创建、修复并验证固定
 
 - 创建或修复固定模板与稳定根 composition；
 - 归档用户已经提供的锁定输入，保留源路径、项目相对路径、大小与 SHA-256；
+- **校验数字人视频来源**：按 `asset-plan` 的 provider 与时长约束；未配置服务时只接受 `--show-pip-placeholder` 或用户导出成片，禁止伪造生成成功；
 - 校验媒体可解码性和时长、字幕 schema/时间、motion contract 覆盖与 source hash；
 - 写 manifest 和 template handoff；
 - 运行只证明固定舞台的结构检查与 stage proof；
 - 根据就绪状态停止或路由下游。
+
+**出脸前必读** [../../references/digital-human-routing.md](../../references/digital-human-routing.md)，并运行：
+
+```bash
+python3 ../../scripts/doctor.py --stage s4
+```
 
 本 Skill 不导演镜头，不写内容场景，不选择语义动效或转场，不做 SFX/BGM 设计，不渲染整片，不审片，也不整改内容实现。不得为了演示而加入标题页、三卡片、流程图、TopBar、通用 `enterStyle` 或全局 crossfade。
 
