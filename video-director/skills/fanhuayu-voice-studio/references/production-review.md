@@ -1,6 +1,6 @@
 # 构图、字幕合成与实际 MP4 验收
 
-工作室根目录：`/Users/fanhuayu/Documents/晓儿/50_个人项目/技术项目/本地声音克隆/voice-studio`。
+工作室根目录：`$TTH_STUDIO_ROOT`。
 
 ## 构图与字幕
 - 基线：`presets/avatar-composition-v1.json`，来自 2026-09-08 已导出的 9 秒样片及其 qa.json。

@@ -1,6 +1,6 @@
 ---
 name: minimax-voice-director
-description: 用 MiniMax 云端为视频制作可审批的声音导演稿，再生成、挑选和验收人声，最后以定稿音频产生字幕。用于用户明确选择 MiniMax 配音、继续已有 MiniMax 视频配音项目，或明确请求 MiniMax Voice ID/克隆/设计。范铧屿个人视频默认使用 fanhuayu-voice-studio 的本地 Qwen3-TTS，本 skill 只作明确授权的云端备用；音乐、BGM、歌曲使用同级 music Skill。
+description: 用 MiniMax 云端为视频制作可审批的声音导演稿，再生成、挑选和验收人声，最后以定稿音频产生字幕。用于用户明确选择 MiniMax 配音、继续已有 MiniMax 视频配音项目，或明确请求 MiniMax Voice ID/克隆/设计。口播/个人视频默认使用 voice-studio 的本地 Qwen3-TTS，本 skill 只作明确授权的云端备用；音乐、BGM、歌曲使用同级 music Skill。
 metadata:
   tags: minimax, tts, voice-director, voiceover, subtitles, cloud-api
 ---
@@ -18,7 +18,7 @@ metadata:
 ## 路由边界
 
 - 用户明确选择 MiniMax 配音，或当前项目已经用 MiniMax：进入三阶段主流程。
-- 范铧屿本人账号和个人视频：默认路由到 `fanhuayu-voice-studio`；只有用户明确选择 MiniMax、确认云端上传和费用时才回到本流程。
+- 主账号和个人视频：默认路由到 `voice-studio`；只有用户明确选择 MiniMax、确认云端上传和费用时才回到本流程。
 - 用户只说 TTS、旁白、自己的声音，但没有选 MiniMax：不自动替换引擎，先根据上下文路由到合适的本地或云端工作流。
 - 用户要 MiniMax Voice ID、声音克隆、声音设计或旧函数兼容：读 `references/runtime.md`，该分支不自动触发配音主流程。
 - 音乐、BGM、歌曲或 cover：改用同级 `music`（ElevenLabs Music API）。
@@ -48,7 +48,7 @@ metadata:
 ### 3. 只从定稿音频生成字幕
 
 1. 只对 `audio_approved` 且 hash 匹配的最终 WAV 生成时间轴；M4A/MP3 是发布衍生物，不作为字幕时间基准。任何 Take、速度、裁剪或拼接变化都使旧时间轴失效。
-2. 范铧屿本机项目默认使用 BaoCut 本地 `qwen3-asr-0.6b` 生成 ASR 时间轴、SRT/VTT 和审计证据，不上传音频。只有用户明确选择云端字幕服务时，才使用 `audio-to-subtitles`，并再次说明 R2/MediaKit 上传边界。
+2. 本机项目默认使用 BaoCut 本地 `qwen3-asr-0.6b` 生成 ASR 时间轴、SRT/VTT 和审计证据，不上传音频。只有用户明确选择云端字幕服务时，才使用 `audio-to-subtitles`，并再次说明 R2/MediaKit 上传边界。
 3. ASR 只提供时间轴。用 `work/tts/subtitle-source.txt` 回填最终显示文本，不显示呼吸、停顿和发音标记。
 4. 读 `references/output-layout.md` 交付 SRT/VTT/JSON 和 raw ASR 证据，通过 `scripts/mark_subtitled.py` 把交付文件的 hash 绑定到已批准音频。数字人、口型和正式剪辑都必须以这份定稿音频为唯一时间基准。
 

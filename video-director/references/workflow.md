@@ -72,7 +72,7 @@ For data-driven videos, ensure each important chart or claim maps to an entry
 in `source-ledger.md` and the relevant cleaned-data fields.
 
 For Fan Huayu's own narration-led videos, obtain a ready
-`video-handoff.json` from `fanhuayu-voice-studio` before creating a formal
+`video-handoff.json` from `voice-studio` before creating a formal
 timeline. Its approved WAV and BaoCut captions are the single audio-timebase;
 do not substitute a draft take or silently fall back to MiniMax.
 

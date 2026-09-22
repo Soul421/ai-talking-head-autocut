@@ -5,9 +5,9 @@ description: End-to-end AI video director for turning a user's natural-language 
 
 # Video Director
 
-## 范铧屿个人配音入口
+## {SPEAKER}个人配音入口
 
-- 范铧屿本人账号、口播、旁白和视频配音，先使用 `fanhuayu-voice-studio`：本地 Qwen3-TTS 为默认，MiniMax API 只作用户明确授权的备用。
+- 主账号、口播、旁白和视频配音，先使用 `voice-studio`：本地 Qwen3-TTS 为默认，MiniMax API 只作用户明确授权的备用。
 - 字幕与内容复核默认由 BaoCut 本地完成，不走 R2/MediaKit 隐性上传。
 - 只有 `video-handoff.json` 为 `ready` 且已批准音频 hash 匹配，才进入 `video-script`、数字人、HyperFrames 或最终剪辑。
 - 正文、声音、语速、剪裁或拼接一旦变化，返回声音工作室重新验收；不得沿用旧字幕时间轴。

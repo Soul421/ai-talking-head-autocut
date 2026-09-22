@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""范铧屿本地声音工作室：Qwen3-TTS、BaoCut 验收与视频交接。"""
+"""本地声音工作室：Qwen-TTS、BaoCut 验收与视频交接。路径与批准人来自 config / TTH_* 环境变量。"""
 
 from __future__ import annotations
 
@@ -24,26 +24,38 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
+try:
+    from tth_config import load_config
+except Exception:  # pragma: no cover - fallback when helper missing
+    def load_config() -> dict[str, Any]:
+        return {}
+
+_TTH = load_config()
+
 ROOT = Path(__file__).resolve().parents[1]
 RUNS_DIR = ROOT / "runs"
 INDEX_PATH = Path(__file__).with_name("index.html")
-QWEN_PYTHON = Path("/Users/fanhuayu/.codex/runtimes/qwen3-tts-mlx/bin/python")
-QWEN_MODEL = Path("/Users/fanhuayu/.codex/models/Qwen3-TTS-12Hz-1.7B-Base-8bit")
-REFERENCE_AUDIO = Path(
-    "/Users/fanhuayu/Documents/晓儿/50_个人项目/技术项目/本地声音克隆/inputs/"
-    "2026-08-07-范铧屿-参考录音-24k-mono.wav"
-)
-REFERENCE_TEXT = (
-    "大家好，我是范铧屿，今天想跟大家聊聊人工智能正在怎样改变我们的工作和生活。"
-    "很多变化看起来很遥远。实际上，离我们却很近。其实已经发生在我们的身边。"
+
+def _cfg_path(key: str, default: str = "") -> Path:
+    raw = _TTH.get(key) or default
+    return Path(raw).expanduser() if raw else Path("")
+
+QWEN_PYTHON = _cfg_path("qwen_python") or Path(sys.executable)
+QWEN_MODEL = _cfg_path("qwen_model")
+REFERENCE_AUDIO = _cfg_path("reference_audio")
+REFERENCE_TEXT = _TTH.get("reference_text") or (
+    "大家好，今天想跟大家聊聊人工智能正在怎样改变我们的工作和生活。"
+    "很多变化看起来很遥远。实际上，离我们却很近。"
     "面对新的技术，我们不必焦虑。更重要的是，理解它、使用它，并找到真正适合自己的方式。"
 )
-LEGACY_BAOCUT = Path("/Users/fanhuayu/.codex/skills/baocut/bin/baocut")
+SPEAKER_NAME = _TTH.get("speaker_name") or "Speaker"
+REVIEWER_NAME = _TTH.get("reviewer_name") or "Reviewer"
+LEGACY_BAOCUT = _cfg_path("baocut_bin")
 BAOCUT = Path(os.environ.get(
     "VOICE_STUDIO_BAOCUT",
-    str(Path.home() / ".local/share/voice-studio/baocut/1.1.4/bcut"),
+    _TTH.get("baocut_bin") or str(Path.home() / ".local/share/voice-studio/baocut/1.1.4/bcut"),
 ))
-TERMS_FILE = ROOT / "terms.txt"
+TERMS_FILE = Path(_TTH.get("terms_file") or ROOT / "terms.txt")
 MINIMAX_HELPER = Path(__file__).with_name("minimax_generate.py")
 SCHEMA_VERSION = 1
 
@@ -132,7 +144,7 @@ class VoiceStudio:
             item.exists() for item in (QWEN_PYTHON, QWEN_MODEL, REFERENCE_AUDIO, BAOCUT)
         )
         return {
-            "studio": "范铧屿本地声音工作室",
+            "studio": "本地声音工作室",
             "schema_version": SCHEMA_VERSION,
             "default_engine": "qwen-local",
             "local_ready": local_ready,
@@ -309,7 +321,7 @@ class VoiceStudio:
             str(BAOCUT), "--json", "transcribe", str(audio),
             "--model", "qwen3-asr-0.6b", "--source-lang", "zh", "--no-speakers",
             "--terms-file", str(TERMS_FILE),
-            "--title", f"范铧屿声音工作室 {job_id}",
+            "--title", f"声音工作室 {job_id}",
             "--desc", "本地 Qwen3-TTS 或明确授权的 MiniMax 备用配音；用于内容完整性与字幕时间轴验收。",
         ]
         result = run(command)
@@ -404,7 +416,7 @@ class VoiceStudio:
         atomic_json(job_dir / "baocut-audit.json", audit)
         return str(project), audit
 
-    def approve(self, job_id: str, approved_by: str = "范铧屿", rhythm_reviewed: bool = False) -> dict[str, Any]:
+    def approve(self, job_id: str, approved_by: str = "", rhythm_reviewed: bool = False) -> dict[str, Any]:
         job_dir, manifest = self._job(job_id)
         if manifest.get("qa", {}).get("status") != "pass":
             raise PermissionError("BaoCut 验收尚未通过，不能批准")
@@ -418,7 +430,7 @@ class VoiceStudio:
             "rhythm_review": {"status": "approved", "items": ["读音", "停顿", "重音", "语速", "结尾"]},
             "status": "approved",
             "approved_at": now_iso(),
-            "approved_by": approved_by.strip() or "范铧屿",
+            "approved_by": (approved_by or "").strip() or REVIEWER_NAME,
             "audio_sha256": sha256(audio),
             "text_sha256": hashlib.sha256(manifest["text"].encode("utf-8")).hexdigest(),
         }
@@ -532,7 +544,7 @@ class Handler(BaseHTTPRequestHandler):
             elif self.path == "/api/qa":
                 result = self.studio.qa(data.get("job_id", ""))
             elif self.path == "/api/approve":
-                result = self.studio.approve(data.get("job_id", ""), data.get("approved_by", "范铧屿"), data.get("rhythm_reviewed", False))
+                result = self.studio.approve(data.get("job_id", ""), data.get("approved_by", ""), data.get("rhythm_reviewed", False))
             elif self.path == "/api/handoff":
                 result = self.studio.handoff(data.get("job_id", ""))
             else:
@@ -552,7 +564,7 @@ def serve(host: str, port: int, open_browser: bool) -> None:
     Handler.studio = VoiceStudio()
     server = ThreadingHTTPServer((host, port), Handler)
     url = f"http://{host}:{port}"
-    print(f"范铧屿本地声音工作室已启动：{url}")
+    print(f"本地声音工作室已启动：{url}")
     if open_browser:
         threading.Timer(0.7, lambda: webbrowser.open(url)).start()
     try:
@@ -582,7 +594,7 @@ def main() -> int:
         action.add_argument("job_id")
     approve_parser = sub.add_parser("approve")
     approve_parser.add_argument("job_id")
-    approve_parser.add_argument("--by", default="范铧屿")
+    approve_parser.add_argument("--by", default=REVIEWER_NAME)
     approve_parser.add_argument("--rhythm-reviewed", action="store_true", help="本人已听审读音、停顿、重音、语速及结尾并通过")
     args = parser.parse_args()
     studio = VoiceStudio()

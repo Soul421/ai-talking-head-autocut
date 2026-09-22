@@ -104,7 +104,7 @@ python "$SKILL_DIR/scripts/publish_voice.py" \
 ## 阶段三：以最终音频生成字幕
 
 1. 只对批准记录中 hash 匹配的 `work/audio/generated/minimax/final/voice.wav` 生成时间轴。M4A/MP3 是发布衍生物，不作为字幕时间基准。
-2. 范铧屿本机项目默认使用 BaoCut 本地 `qwen3-asr-0.6b` 生成时间轴、SRT/VTT 和审计证据，并用专名词典修正“范铧屿”等固定词。该路径不上传音频。只有用户明确选择云端字幕服务时，才使用 `audio-to-subtitles` 完成 R2 上传和 MediaKit ASR，并再次确认上传边界。
+2. 本机项目默认使用 BaoCut 本地 `qwen3-asr-0.6b` 生成时间轴、SRT/VTT 和审计证据，并用专名词典修正“{SPEAKER}”等固定词。该路径不上传音频。只有用户明确选择云端字幕服务时，才使用 `audio-to-subtitles` 完成 R2 上传和 MediaKit ASR，并再次确认上传边界。
 3. ASR 只提供时间轴。用 `work/tts/subtitle-source.txt` 回填显示文本，删除所有 TTS 私有标记和发音辅助。
 4. 项目交付到 `work/captions/`：`captions.srt`、`captions.vtt`、`captions_aligned.json`，并保留 raw ASR 和 `asr-result.json`。
 5. 检查时间轴和显示文本后，把字幕绑定到已批准音频；本机工作室用 `video-handoff.json` 保存 BaoCut 项目编号、字幕路径和音频 hash。旧 MiniMax 项目仍可使用：

@@ -150,32 +150,32 @@
     "sha256": "50eceedda9e54f38ab1422a5a44235201c8d57e4911e232488d5814c0c9536ec"
   },
   {
-    "path": "skills/fanhuayu-voice-studio/SKILL.md",
+    "path": "skills/voice-studio/SKILL.md",
     "bytes": 5461,
     "sha256": "d44b21050656def285eb609a5ef4f3352705d1551655927d31b6f27ff8d57c08"
   },
   {
-    "path": "skills/fanhuayu-voice-studio/agents/openai.yaml",
+    "path": "skills/voice-studio/agents/openai.yaml",
     "bytes": 303,
     "sha256": "7002a3e1b8e92e615bd250de769dfe6f9b3472abd18e6d5956ce56e02c4bd301"
   },
   {
-    "path": "skills/fanhuayu-voice-studio/references/production-review.md",
+    "path": "skills/voice-studio/references/production-review.md",
     "bytes": 2445,
     "sha256": "43d80afb09aad0cc77799602b324103fe988ab63e8733a4b2fb4b5033c947eff"
   },
   {
-    "path": "skills/fanhuayu-voice-studio/references/validation-registry.md",
+    "path": "skills/voice-studio/references/validation-registry.md",
     "bytes": 864,
     "sha256": "5d4ae270cb42d2adbde51e31d78e423ffa7c0d8c106433993556cc44f7f92d8c"
   },
   {
-    "path": "skills/fanhuayu-voice-studio/references/video-handoff.md",
+    "path": "skills/voice-studio/references/video-handoff.md",
     "bytes": 1363,
     "sha256": "19595c1d2f9cb7b105eb5d9cf1fdd0221b6cbc0b401f4f74ea887d7bc59ea51d"
   },
   {
-    "path": "skills/fanhuayu-voice-studio/scripts/voice_studio.py",
+    "path": "skills/voice-studio/scripts/voice_studio.py",
     "bytes": 435,
     "sha256": "1014a4285d2b14d1db2cec5d5848dc2c1365eb20e05623134a28d55130e4f2c9"
   },

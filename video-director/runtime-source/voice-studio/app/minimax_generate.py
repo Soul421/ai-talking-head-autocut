@@ -4,10 +4,14 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
-ASSET_DIR = Path("/Users/fanhuayu/.codex/skills/minimax-voice-director/assets")
+ASSET_DIR = Path(os.environ.get(
+    "TTH_MINIMAX_ASSETS",
+    str(Path(__file__).resolve().parents[3] / "skills" / "minimax-voice-director" / "assets"),
+))
 sys.path.insert(0, str(ASSET_DIR))
 
 from minimax_tts import text_to_audio  # noqa: E402

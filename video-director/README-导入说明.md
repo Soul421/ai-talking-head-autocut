@@ -9,7 +9,7 @@
 ## 模块
 
 - video-director
-- fanhuayu-voice-studio
+- voice-studio
 - baocut
 - video-script
 - video-spec-builder

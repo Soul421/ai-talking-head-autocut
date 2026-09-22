@@ -14,6 +14,45 @@
 
 > 技术演示，不代表人工嘴型听审已通过。
 
+## 一键安装
+
+```bash
+git clone https://github.com/Soul421/ai-talking-head-autocut.git
+cd ai-talking-head-autocut
+./install.sh --speaker "你的名字" --reviewer "你的名字"
+```
+
+脚本会：
+
+1. 把 `video-director` 与 9 个配套 skill 装进本机 Agent 的 Skill 目录（`~/.codex/skills`、`~/.claude/skills` 等，可用 `--dir` 指定）
+2. 生成 `~/.config/ai-talking-head-autocut/config.json`（路径、音色参考、批准人）
+3. 自动去掉作者本机绝对路径，把人名替换成你传入的 speaker/reviewer
+
+可选依赖（完整出片才需要）：Python 3.9+、Node.js、FFmpeg、BaoCut、本地 Qwen-TTS、HyperFrames 0.7.65、HeyGen 账号。
+
+## 30 秒最小可跑示例
+
+不配 TTS、不连云端，也能跑通**门禁链路**：
+
+```bash
+python3 examples/mini-30s/run_minimal.py
+```
+
+会锁定正文 hash → 生成 30s 时间轴字幕与占位音频 → 写出待审批准记录 → 产出 `video-handoff.json`。  
+配置好声音模型后，加 `--real-voice` 走真实 generate → 听审 → approve → handoff。
+
+详见 [examples/mini-30s/README.md](examples/mini-30s/README.md)。
+
+## 通用听审合同
+
+人工批准**不绑定个人**，统一按 [video-director/templates/review-contract.md](video-director/templates/review-contract.md)：
+
+- §A 声音节奏听审（读音/停顿/重音/语速/结尾）
+- §B 全镜头静态审核
+- §C 成片播放验收
+
+`approve --by` 只是记录谁审过；Agent 不得代批。
+
 ## 包内模块
 
 根目录 `video-director/` 为总控 Skill，`skills/` 下为配套模块：
@@ -21,7 +60,7 @@
 | 模块 | 职责 |
 | --- | --- |
 | video-director | 端到端总控与生产协调 |
-| fanhuayu-voice-studio | 本地克隆配音与声音验收 |
+| voice-studio（安装时由 fanhuayu-voice-studio 映射） | 本地克隆配音与声音验收 |
 | baocut | 本地转写、字幕与剪辑 |
 | video-script | 导演稿与 Beat Graph |
 | video-spec-builder | 制作规格与分镜 |
@@ -31,30 +70,22 @@
 | douyin-cover | 封面诊断与模板 |
 | minimax-voice-director | MiniMax 云端配音（可选） |
 
-## 安装
+## 配置
 
-1. 将 `video-director/` 根目录作为 `video-director` Skill 安装。
-2. 将 `video-director/skills/` 下各目录安装到目标 Agent 的 Skill 搜索路径。
-3. 先读取根 `SKILL.md`，并按阶段读取对应模块。
+`~/.config/ai-talking-head-autocut/config.json` 或环境变量：
 
-详细说明见 [video-director/README-导入说明.md](video-director/README-导入说明.md)。
-
-## 外部依赖
-
-- Python、Node.js、FFmpeg
-- BaoCut、本地 Qwen3-TTS 环境和模型
-- HyperFrames 0.7.65 及 hyperframes / hyperframes-cli / gsap 等官方插件
-- HeyGen 数字人（需自行配置账号与授权素材；包内没有独立的 HeyGen 生成器）
-- MiniMax API（可选，需单独授权）
+| 变量 | 含义 |
+| --- | --- |
+| `TTH_SPEAKER` / `TTH_REVIEWER` | 出镜人 / 听审批准人 |
+| `TTH_QWEN_PYTHON` / `TTH_QWEN_MODEL` | 本地 TTS |
+| `TTH_REFERENCE_AUDIO` / `TTH_REFERENCE_TEXT` | 克隆参考音 |
+| `TTH_BAOCUT` | BaoCut 可执行文件 |
 
 ## 迁移边界
 
-- 保留原始脚本和本机路径，跨设备使用前须映射路径、安装运行环境并重新验证。
-- 包内不含账号凭据、环境配置、私人音色参考音、人物照片、模型权重或真实项目运行记录。
-- 测试夹具未打包；需运行回归测试时使用源工程。
-- 第三方工具及插件不作为原创内容重新分发。
-- 声音工作室应用源码在 `video-director/runtime-source/voice-studio/app`，原入口指向作者本机，迁移时需调整。
-- 封面参考人物图片须由使用者提供。
+- 不含账号凭据、私人音色、人物照片、模型权重。
+- 第三方工具及插件不作为原创内容再分发。
+- HeyGen 数字人需自行配置账号与授权素材。
 
 ## License
 

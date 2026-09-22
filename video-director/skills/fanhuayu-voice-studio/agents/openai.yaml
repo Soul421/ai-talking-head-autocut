@@ -1,4 +1,4 @@
 interface:
-  display_name: "范铧屿本地声音工作室"
+  display_name: "本地声音工作室"
   short_description: "本地 Qwen3-TTS 配音、BaoCut 验收、批准后交给视频流程"
   default_prompt: "Use the Fan Huayu local voice studio. Default to local Qwen3-TTS, validate with BaoCut locally, and hand off only approved audio."
