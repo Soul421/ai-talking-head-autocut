@@ -1,0 +1,89 @@
+<template id="caption-overlay-template">
+  <div
+    id="caption-overlay-root"
+    data-composition-id="caption-overlay"
+    data-start="0"
+    data-duration="18"
+    data-width="1920"
+    data-height="1080"
+  >
+    <!-- HYPERFRAMES_CAPTION_GROUPS -->
+    <div class="caption-line" aria-hidden="true"></div>
+    <style>
+      @font-face {
+        font-family: "Noto Sans SC";
+        src: url("assets/fonts/NotoSansSC-400.ttf") format("truetype");
+        font-style: normal;
+        font-weight: 400;
+      }
+
+      @font-face {
+        font-family: "Noto Sans SC";
+        src: url("assets/fonts/NotoSansSC-500.ttf") format("truetype");
+        font-style: normal;
+        font-weight: 500;
+      }
+
+      @font-face {
+        font-family: "Noto Sans SC";
+        src: url("assets/fonts/NotoSansSC-700.ttf") format("truetype");
+        font-style: normal;
+        font-weight: 700;
+      }
+
+      @font-face {
+        font-family: "PingFang SC";
+        src: local("PingFang SC");
+      }
+
+      @font-face {
+        font-family: "Microsoft YaHei";
+        src: local("Microsoft YaHei");
+      }
+
+      #caption-overlay-root {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: visible;
+        pointer-events: none;
+        background: transparent;
+      }
+
+      /* HYPERFRAMES_CAPTION_STYLES */
+      .caption-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 96px;
+        width: calc(100% - 240px);
+        max-width: 1680px;
+        min-height: 50px;
+        margin: 0 auto;
+        overflow: visible;
+        white-space: nowrap;
+        background: transparent;
+        color: #151922;
+        font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 40px;
+        font-weight: 500;
+        line-height: 1.25;
+        letter-spacing: 0;
+        text-align: center;
+      }
+
+      .caption-line .accent {
+        color: #2f6fff;
+        font-weight: 700;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const timeline = gsap.timeline({ paused: true });
+      /* HYPERFRAMES_CAPTION_KILLS */
+      window.__timelines["caption-overlay"] = timeline;
+    </script>
+  </div>
+</template>

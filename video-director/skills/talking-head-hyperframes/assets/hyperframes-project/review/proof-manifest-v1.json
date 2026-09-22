@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "proofVersion": 1,
+  "lifecycle": { "status": "REVIEWING" },
+  "executor": { "id": "replace-with-single-owner-id" },
+  "commandGates": [],
+  "evidence": [],
+  "animationMapReview": {
+    "status": "FAIL",
+    "explainedFlags": [],
+    "unexplainedFlags": []
+  },
+  "reports": {
+    "executor": { "status": "FAIL", "path": "review/executor-report-v1.md" },
+    "lead": { "status": "FAIL", "path": "review/lead-review-v1.md" }
+  },
+  "reviews": {
+    "revisionOwner": "replace-with-single-owner-id",
+    "fourPasses": {
+      "montage": { "status": "FAIL", "readCaptions": false, "evidenceRoles": ["contact_sheet"] },
+      "static": { "status": "FAIL", "evidenceRoles": ["source_acceptance", "widest_caption", "pip_crop"] },
+      "motion": { "status": "FAIL", "watchedFullPreview": false, "evidenceRoles": ["internal_preview", "full_watch_decode", "transition_midpoint", "readable_hold"] },
+      "delivery": { "status": "FAIL", "evidenceRoles": ["internal_preview", "full_watch_decode", "audio_first_region", "audio_last_region", "black_tail", "silent_tail"] }
+    },
+    "findings": []
+  },
+  "previews": {
+    "internal": { "status": "FAIL", "path": "renders/internal-preview-v1.mp4" },
+    "previewV1": { "status": "NOT_APPLICABLE", "path": "renders/preview-v1.mp4" }
+  },
+  "approval": {
+    "previewV1Approved": false,
+    "reviewer": "",
+    "approvedProofVersion": null
+  },
+  "formalRelease": {
+    "status": "NOT_APPLICABLE",
+    "deferred": true,
+    "target": "1920x1080, 30fps, H.264 High, yuv420p, 12 Mbps, slow two-pass"
+  }
+}

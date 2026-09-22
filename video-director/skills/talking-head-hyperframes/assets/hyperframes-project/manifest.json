@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "title": "Studio Warm-White Fixed Stage",
+  "status": "TEMPLATE_ONLY",
+  "durationSeconds": 18,
+  "fixedStage": {
+    "version": "studio-warm-white-fixed-stage-v3",
+    "compositionId": "studio-fixed-stage",
+    "geometryContract": "studio-blue-gold-narrow-center-grid-v2",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "background": "studio-background",
+    "content": "content",
+    "captions": "caption-overlay",
+    "pipMounted": false,
+    "pipMode": "absent",
+    "pipContract": {
+      "frameRegion": {
+        "x": 1610,
+        "y": 724,
+        "width": 206,
+        "height": 206,
+        "right": 104,
+        "bottom": 150,
+        "zIndex": 90
+      },
+      "mediaRegion": {
+        "x": 1618,
+        "y": 732,
+        "width": 190,
+        "height": 190,
+        "right": 112,
+        "bottom": 158,
+        "zIndex": 89
+      },
+      "sourceCrop": {
+        "fit": "cover",
+        "objectPositionXPercent": 66.7,
+        "objectPositionYPercent": 50,
+        "profile": "bozhou-digital-twin-v1"
+      },
+      "background": {
+        "mode": "pale-blue-gray-c",
+        "opaque": true,
+        "base": "#f2f6f8"
+      },
+      "subjectSafeArea": {
+        "faceCenterXPercent": [48, 52],
+        "hairTopYPercent": [25, 32],
+        "eyeLineYPercent": [45, 52],
+        "chinYPercent": [68, 76],
+        "shoulderWidthPercent": [70, 90]
+      },
+      "review": {
+        "staticBeforeMotion": true,
+        "encodedZoomRequired": true,
+        "crop": "300:300:1560:680",
+        "scale": "900:900"
+      }
+    },
+    "contentMotionDefault": "none",
+    "globalSceneTransition": "none"
+  },
+  "design": {
+    "path": "DESIGN.md",
+    "sha256": "f0b16ac642540fcb646a9e4a4813e6e707f45dc92cb9dce4d040298caeccff63",
+    "bytes": 5784
+  },
+  "inputs": {
+    "directorScript": null,
+    "productionSpec": null,
+    "assetPlan": null,
+    "motionContract": null,
+    "audio": null,
+    "talkingHead": null,
+    "captionsAligned": null,
+    "captionsSrt": null,
+    "captionsVtt": null,
+    "screenRecordings": [],
+    "screenshots": [],
+    "fonts": []
+  },
+  "motionContract": null,
+  "validation": {
+    "audioDecodable": false,
+    "alignedCaptionCount": null,
+    "alignedCaptionsEndSeconds": null,
+    "captionBoundsValid": false,
+    "contractSchemaValid": false,
+    "contractSourcesMatch": false
+  },
+  "missingInputs": [
+    {
+      "id": "directorScript",
+      "action": "Provide the user-confirmed director script with --director-script (or --script).",
+      "expectedPath": "inputs/视频脚本.md",
+      "actualPath": null
+    },
+    {
+      "id": "productionSpec",
+      "action": "Provide the confirmed production specification with --production-spec.",
+      "expectedPath": "inputs/制作规格.md",
+      "actualPath": null
+    },
+    {
+      "id": "assetPlan",
+      "action": "Provide the approved asset plan with --asset-plan.",
+      "expectedPath": "inputs/素材计划.md",
+      "actualPath": null
+    },
+    {
+      "id": "motionContract",
+      "action": "Provide a full-timeline motion contract with --motion-contract.",
+      "expectedPath": "inputs/motion-contract.json",
+      "actualPath": null
+    },
+    {
+      "id": "audio",
+      "action": "Provide decodable locked voice media with --audio.",
+      "expectedPath": "assets/audio/voice/voice.<ext>",
+      "actualPath": null
+    },
+    {
+      "id": "captionsAligned",
+      "action": "Provide non-empty aligned JSON captions with --captions.",
+      "expectedPath": "inputs/captions/captions_aligned.json",
+      "actualPath": null
+    }
+  ],
+  "nextSkill": null
+}

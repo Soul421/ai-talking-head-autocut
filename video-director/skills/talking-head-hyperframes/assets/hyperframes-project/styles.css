@@ -1,0 +1,96 @@
+@font-face {
+  font-family: "Noto Sans SC";
+  src: url("assets/fonts/NotoSansSC-400.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Noto Sans SC";
+  src: url("assets/fonts/NotoSansSC-500.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Noto Sans SC";
+  src: url("assets/fonts/NotoSansSC-700.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "PingFang SC";
+  src: local("PingFang SC");
+}
+
+@font-face {
+  font-family: "Microsoft YaHei";
+  src: local("Microsoft YaHei");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("assets/fonts/SpaceGrotesk-400.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "SFMono-Regular";
+  src: local("SFMono-Regular");
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: #f7f8f3;
+}
+
+body {
+  color: #151922;
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+code,
+pre,
+.monospace {
+  font-family: "Space Grotesk", "SFMono-Regular", "Menlo", "Consolas", monospace;
+}
+
+#fixed-stage-root,
+#fixed-stage-root > [data-composition-src] {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+}
+
+#fixed-stage-root {
+  isolation: isolate;
+  background: #f7f8f3;
+}
+
+#background-mount {
+  z-index: 0;
+}
+
+#content-mount {
+  z-index: 10;
+  background: transparent;
+}
+
+#caption-mount {
+  z-index: 100;
+  background: transparent;
+  pointer-events: none;
+}

@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "pipeline": "remotion",
+  "fps": 30,
+  "timeline": {
+    "programDurationSeconds": 7,
+    "audioDurationSeconds": 6.5,
+    "captionsEndSeconds": 6.3
+  },
+  "sourceHashes": {
+    "directorScript": "0000000000000000000000000000000000000000000000000000000000000000",
+    "productionSpec": "0000000000000000000000000000000000000000000000000000000000000000",
+    "assetPlan": "0000000000000000000000000000000000000000000000000000000000000000",
+    "audio": "0000000000000000000000000000000000000000000000000000000000000000",
+    "captionsAligned": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "hardRejections": [
+    "repeated-generic-entrance",
+    "decorative-continuous-motion",
+    "unanchored-decoration",
+    "generic-ai-decoration",
+    "empty-reset-transition",
+    "unreadable-transition-midpoint"
+  ],
+  "fixedStage": {
+    "template": "studio-warm-grid",
+    "contentMotionDefault": "none",
+    "globalSceneTransition": "none",
+    "continuousMotionAllowlist": [
+      "PremiumGridBackground"
+    ]
+  },
+  "beats": [
+    {
+      "beatId": "B01",
+      "startSeconds": 0,
+      "endSeconds": 4,
+      "mode": "motion",
+      "state": {
+        "from": "A concrete input is visible but its consequence is unknown.",
+        "to": "The input has been routed to the one consequence named by the narration.",
+        "newUnderstanding": "The viewer can see the causal relationship, not just read its label."
+      },
+      "primaryMotion": {
+        "id": "route-input-to-consequence",
+        "semanticReason": "The moving input establishes which output it causes."
+      },
+      "supportMotion": null,
+      "continuousMotions": [],
+      "stillReason": null,
+      "readableHold": {
+        "startSeconds": 2.2,
+        "endSeconds": 3.5,
+        "reason": "The causal result must remain readable before the handoff."
+      },
+      "handoff": {
+        "toBeatId": "B02",
+        "object": "the confirmed consequence",
+        "midpointSeconds": 3.8,
+        "midpointAssertion": "The consequence remains readable while its frame becomes the next beat's evidence frame."
+      },
+      "deletionTest": "Removing the route would hide which input produced the result.",
+      "rejectionConditions": [
+        "The beat is implemented only as opacity plus upward translation.",
+        "Decorative lines have no start or end anchor.",
+        "The handoff passes through an empty frame."
+      ],
+      "acceptanceFrames": [
+        {
+          "atSeconds": 0,
+          "role": "start",
+          "assertions": [
+            "The input is visible and the consequence is not yet claimed."
+          ]
+        },
+        {
+          "atSeconds": 2.2,
+          "role": "state_complete",
+          "assertions": [
+            "The input is visibly connected to exactly one consequence."
+          ]
+        },
+        {
+          "atSeconds": 3.8,
+          "role": "transition_midpoint",
+          "assertions": [
+            "The consequence remains the readable subject of the frame."
+          ]
+        }
+      ]
+    },
+    {
+      "beatId": "B02",
+      "startSeconds": 4,
+      "endSeconds": 7,
+      "mode": "readable-hold",
+      "state": {
+        "from": "The confirmed consequence has just arrived from B01.",
+        "to": "The same evidence remains stable for inspection.",
+        "newUnderstanding": "The viewer has enough time to read and verify the evidence."
+      },
+      "primaryMotion": null,
+      "supportMotion": null,
+      "continuousMotions": [],
+      "stillReason": "This beat is for evidence reading; extra movement would compete with comprehension.",
+      "readableHold": {
+        "startSeconds": 4,
+        "endSeconds": 7,
+        "reason": "The evidence must remain fully legible for the entire beat."
+      },
+      "handoff": null,
+      "deletionTest": "Shortening the hold would remove the viewer's opportunity to verify the evidence.",
+      "rejectionConditions": [
+        "The evidence card floats or breathes continuously.",
+        "A decorative transition covers the evidence.",
+        "The shot adds unrelated icons or particles."
+      ],
+      "acceptanceFrames": [
+        {
+          "atSeconds": 4,
+          "role": "start",
+          "assertions": [
+            "The evidence inherited from B01 is already visible."
+          ]
+        },
+        {
+          "atSeconds": 5.5,
+          "role": "readable_hold",
+          "assertions": [
+            "All evidence text is stable, legible, and unobstructed."
+          ]
+        }
+      ]
+    }
+  ]
+}

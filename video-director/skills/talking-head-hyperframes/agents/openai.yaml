@@ -1,0 +1,7 @@
+interface:
+  display_name: "Talking Head HyperFrames"
+  short_description: "创建口播固定舞台，锁定数字人裁切、背景和静态审核"
+  default_prompt: "Use $talking-head-hyperframes to create or validate the fixed-stage project, including the exact digital-human PIP geometry, crop, opaque background, locked inputs, and static-shot approval handoff."
+
+policy:
+  allow_implicit_invocation: true

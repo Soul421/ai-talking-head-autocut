@@ -1,0 +1,119 @@
+version: 1
+status: draft
+engine: minimax
+model: speech-2.8-hd
+profile: hybrid
+
+source:
+  path: ../source/script.md
+  sha256: null
+
+global:
+  scene: chinese_explainer
+  audience: 对 AI 和内容创作有兴趣的中文观众
+  relationship: 像和熟人分享刚想明白的方法
+  performance_goal: 自然、利落、有轻微平仄和推进感，不做播音式表演
+  base_emotion: 冷静自信
+  emotional_arc: 开头快速建立问题，转折处略提能量，结论明确落下
+  target_characters_per_second: [5.0, 5.3]
+  final_tempo: 1.1
+  avoid:
+    - 播音腔
+    - 模板化疑问腔
+    - 每句都重读
+    - 过密呼吸和人工停顿
+    - 相邻段落音色或情绪拼贴
+  voice:
+    id_env: MINIMAX_VOICE_ID
+    speed: 1.0
+    vol: 1.0
+    pitch: 0
+    language_boost: auto
+
+segments:
+  - id: s001
+    subtitle_text: 很多人以为，AI配音只要声音像就够了。
+    spoken_text: 很多人以为，AI配音只要声音像就够了。
+    rewrite:
+      level: none
+      reason: null
+    speech_act: 复述观众常见认知
+    subtext: 先站到观众一边，为后面纠正做准备
+    emotion:
+      state: 冷静、理解
+      intensity: low
+      transition: 保持基线，不急着表态
+    rhythm:
+      base: compact
+      curve: 匀速，句尾轻收
+      continuity: 一口气说完，不在逗号处强停
+    focus:
+      - text: 声音像
+        type: 旧认知焦点
+        strength: moderate
+        reason: 后一段将把它纠正为表演问题
+    intonation:
+      opening: 平稳进入
+      turn: 无局部转折
+      ending: 轻微悬住，带向下一句
+    micro_breaks: []
+    nonverbal: []
+    boundary:
+      after: flow
+      pause_after_ms: 140
+    render: {}
+    takes: 1
+    director_reason: 这是铺垫，不应抢走后面结论的能量。
+
+  - id: s002
+    subtitle_text: 但真正决定效果的，是它到底会不会表演。
+    spoken_text: 但真正决定效果的，是它到底会不会表演。
+    rewrite:
+      level: none
+      reason: null
+    speech_act: 纠正误解并给出答案
+    subtext: 别只被音色相似度吸引
+    emotion:
+      state: 冷静自信
+      intensity: medium
+      transition: 比上一句提高一档，但不夸张
+    rhythm:
+      base: compact
+      curve: 前半句正常，进入真正后略收慢
+      continuity: 保持整句连续，避免切成碎片
+    focus:
+      - text: 真正
+        type: 对比重音
+        strength: moderate
+        reason: 显示认知方向发生改变
+      - text: 会不会表演
+        type: 结论重音
+        strength: strong
+        reason: 这是该句唯一的新答案
+    intonation:
+      opening: 在但处轻微转向
+      turn: 真正之后收窄音高起伏
+      ending: 明确降调落板
+    micro_breaks:
+      - after: 但
+        pause_ms: 160
+        reason: 放大从旧认知到答案的方向切换
+    nonverbal: []
+    boundary:
+      after: final
+      pause_after_ms: 0
+    render: {}
+    takes: 2
+    director_reason: 通过转折、收速和句尾降调完成，不需要呼吸或叹气。
+
+approval:
+  review:
+    status: pending
+    reviewed_by: null
+    reviewed_at: null
+    content_sha256: null
+  lint: pending
+  human: pending
+  approved_by: null
+  approved_at: null
+  content_sha256: null

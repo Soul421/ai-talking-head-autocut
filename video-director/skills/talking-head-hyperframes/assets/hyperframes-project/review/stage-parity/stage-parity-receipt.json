@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "threshold": 0.995,
+  "cli": "hyperframes@0.7.65",
+  "comparisons": [
+    {
+      "atSeconds": 0,
+      "golden": "proof/goldens/narrow-center-grid-t000.png",
+      "goldenSha256": "0d480d93f1e4fad0ad1f8526eddbce5a77a940157485a4b329ec0cf52719a0cf",
+      "candidate": "review/stage-parity/hyperframes-t000.png",
+      "candidateSha256": "0d480d93f1e4fad0ad1f8526eddbce5a77a940157485a4b329ec0cf52719a0cf",
+      "ssim": 1
+    },
+    {
+      "atSeconds": 4,
+      "golden": "proof/goldens/narrow-center-grid-t004.png",
+      "goldenSha256": "69acc380bf992fd351a4cedd952b94a79e4f124f96bb4041d88edd78e8da98ed",
+      "candidate": "review/stage-parity/hyperframes-t004.png",
+      "candidateSha256": "69acc380bf992fd351a4cedd952b94a79e4f124f96bb4041d88edd78e8da98ed",
+      "ssim": 1
+    },
+    {
+      "atSeconds": 9,
+      "golden": "proof/goldens/narrow-center-grid-t009.png",
+      "goldenSha256": "388e9390d09d44cd56ebb5a55b56dc5dbc92b061a88efcc550d2a855f65fc18a",
+      "candidate": "review/stage-parity/hyperframes-t009.png",
+      "candidateSha256": "388e9390d09d44cd56ebb5a55b56dc5dbc92b061a88efcc550d2a855f65fc18a",
+      "ssim": 1
+    }
+  ]
+}

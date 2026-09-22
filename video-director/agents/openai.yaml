@@ -1,0 +1,4 @@
+interface:
+  display_name: "视频总导演"
+  short_description: "把自然语言视频需求串成调研、核验、分镜、制作和成片质检流程"
+  default_prompt: "帮我把这个视频想法从需求、素材调研、数据核验、分镜一路做到成片。"

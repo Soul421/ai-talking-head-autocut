@@ -1,0 +1,96 @@
+<template id="pip-overlay-template">
+  <div
+    id="pip-overlay-root"
+    data-composition-id="pip-overlay"
+    data-start="0"
+    data-duration="18"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div class="pip-frame" data-media-slot="talking-head-video" aria-label="Optional talking-head picture in picture">
+      <div class="pip-inner">
+        <div class="pip-mask">
+          <div class="avatar-placeholder" aria-hidden="true">
+            <div class="avatar-head"></div>
+            <div class="avatar-body"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <style>
+      #pip-overlay-root {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        pointer-events: none;
+        background: transparent;
+      }
+
+      .pip-frame {
+        position: absolute;
+        right: 104px;
+        bottom: 150px;
+        width: 206px;
+        height: 206px;
+        z-index: 90;
+        border-radius: 50%;
+        box-shadow: 0 26px 58px rgba(31,38,68,0.18), 0 4px 14px rgba(31,38,68,0.08);
+      }
+
+      .pip-inner {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        padding: 7px;
+        border: 1.5px solid rgba(20,82,255,0.55);
+        border-radius: 50%;
+        background-color: rgba(255,255,255,0.92);
+      }
+
+      .pip-mask {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        border-radius: 50%;
+        background: #dcdce2;
+      }
+
+      .avatar-placeholder {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      .avatar-head {
+        position: absolute;
+        top: 44px;
+        left: 75px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background-color: #a9a9a3;
+      }
+
+      .avatar-body {
+        position: absolute;
+        bottom: -16px;
+        left: 43px;
+        width: 120px;
+        height: 88px;
+        border-radius: 58px 58px 24px 24px;
+        background-color: #a9a9a3;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const timeline = gsap.timeline({ paused: true });
+      window.__timelines["pip-overlay"] = timeline;
+    </script>
+  </div>
+</template>

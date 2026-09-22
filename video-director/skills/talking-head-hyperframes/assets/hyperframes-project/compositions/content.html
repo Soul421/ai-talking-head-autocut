@@ -1,0 +1,29 @@
+<template id="content-template">
+  <div
+    id="content-root"
+    data-composition-id="content"
+    data-start="0"
+    data-duration="18"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div class="content-canvas"></div>
+    <style>
+      #content-root,
+      .content-canvas {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: transparent;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const timeline = gsap.timeline({ paused: true });
+      window.__timelines["content"] = timeline;
+    </script>
+  </div>
+</template>

@@ -1,0 +1,46 @@
+#!/bin/sh
+# baocut — run the BaoCut CLI bundled inside the installed macOS app.
+# Shipped with the BaoCut agent skill (github.com/JimLiu/baocut).
+# Symlink onto your PATH if you like:  ln -sfn "$PWD/bin/baocut" /usr/local/bin/baocut
+set -eu
+
+# macOS only.
+if [ "$(uname -s)" != "Darwin" ]; then
+  echo "baocut: BaoCut is macOS-only — this skill needs the BaoCut Mac app." >&2
+  exit 1
+fi
+
+# Tell the CLI which skill is driving it, so it can enforce the version contract.
+# Resolve this script through any PATH symlink to find the sibling SKILL.md.
+SELF="$0"
+while [ -L "$SELF" ]; do
+  link="$(readlink "$SELF")"
+  case "$link" in
+    /*) SELF="$link" ;;
+    *) SELF="$(dirname "$SELF")/$link" ;;
+  esac
+done
+SKILL_MD="$(cd "$(dirname "$SELF")/.." 2>/dev/null && pwd)/SKILL.md"
+if [ -f "$SKILL_MD" ]; then
+  v="$(sed -n 's/^[[:space:]]*version:[[:space:]]*//p' "$SKILL_MD" | head -1 | tr -d '"')"
+  ma="$(sed -n 's/^[[:space:]]*minAppVersion:[[:space:]]*//p' "$SKILL_MD" | head -1 | tr -d '"')"
+  [ -n "$v" ] && export BAOCUT_SKILL_VERSION="$v"
+  [ -n "$ma" ] && export BAOCUT_SKILL_MIN_APP="$ma"
+fi
+
+# Resolve the CLI: $BAOCUT_CLI override -> installed app -> a baocut-cli on PATH.
+for BIN in \
+    "${BAOCUT_CLI:-}" \
+    "/Applications/BaoCut.app/Contents/MacOS/baocut-cli" \
+    "$HOME/Applications/BaoCut.app/Contents/MacOS/baocut-cli"; do
+    [ -n "$BIN" ] && [ -x "$BIN" ] && exec "$BIN" "$@"
+done
+if command -v baocut-cli >/dev/null 2>&1; then exec baocut-cli "$@"; fi
+
+cat >&2 <<'EOF'
+baocut: BaoCut app not found.
+Install BaoCut for Mac from https://baocut.app, then retry. Expected the CLI at:
+  /Applications/BaoCut.app/Contents/MacOS/baocut-cli
+(or set BAOCUT_CLI to the baocut-cli path).
+EOF
+exit 1

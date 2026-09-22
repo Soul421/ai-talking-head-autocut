@@ -1,0 +1,4 @@
+interface:
+  display_name: "Talking-head Dynamic Editing"
+  short_description: "用人物、花字、关系动效和证据素材制作可验收的口播视频"
+  default_prompt: "按 talking-head-dynamic-editing，把已锁定声音转成有人物主画面、重点花字、关系动效和实际 MP4 验收的口播视频方案。"

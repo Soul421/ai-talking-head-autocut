@@ -1,0 +1,215 @@
+<template id="studio-background-template">
+  <div
+    id="studio-background-root"
+    data-composition-id="studio-background"
+    data-start="0"
+    data-duration="18"
+    data-width="1920"
+    data-height="1080"
+    aria-hidden="true"
+  >
+    <div id="ambient-wash"></div>
+    <svg id="perspective-grid" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="grid-stroke" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="rgba(44,58,78,0.16)"></stop>
+          <stop offset="52%" stop-color="rgba(47,111,255,0.30)"></stop>
+          <stop offset="100%" stop-color="rgba(235,178,82,0.22)"></stop>
+        </linearGradient>
+      </defs>
+      <g id="top-plane" data-layout-allow-overflow>
+        <g id="top-rows"></g>
+        <g id="top-verticals"></g>
+      </g>
+      <g id="bottom-plane" data-layout-allow-overflow>
+        <g id="bottom-rows"></g>
+        <g id="bottom-verticals"></g>
+      </g>
+    </svg>
+    <div id="horizon-top" class="horizon-line"></div>
+    <div id="horizon-bottom" class="horizon-line"></div>
+    <div id="center-veil"></div>
+    <div id="grain"></div>
+
+    <style>
+      #studio-background-root {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        pointer-events: none;
+        background-color: #f7f8f3;
+      }
+
+      #ambient-wash,
+      #center-veil,
+      #grain {
+        position: absolute;
+        inset: 0;
+      }
+
+      #perspective-grid {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        filter: drop-shadow(0 18px 30px rgba(47,111,255,0.08));
+      }
+
+      .horizon-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent 4%, rgba(47,111,255,0.26) 32%, rgba(246,196,102,0.18) 62%, transparent 96%);
+        box-shadow: 0 0 24px rgba(47,111,255,0.12);
+      }
+
+      #horizon-top {
+        top: 184px;
+      }
+
+      #horizon-bottom {
+        bottom: 184px;
+      }
+
+      #center-veil {
+        background: radial-gradient(18% 22% at 50% 51%, rgba(255,255,255,0.18), transparent 74%);
+      }
+
+      #grain {
+        opacity: 0.06;
+        background-image: radial-gradient(rgba(21,25,34,0.35) 0.7px, transparent 0.7px);
+        background-size: 4px 4px;
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (() => {
+        window.__timelines = window.__timelines || {};
+
+        const DURATION_SECONDS = 18;
+        const CANVAS_HEIGHT = 1080;
+        const NEAR_Y = -78;
+        const FAR_Y = 342;
+        const ROW_STEP = 62;
+        const ROW_SPEED = 34;
+        const ROW_COUNT = 8;
+        const VERTICAL_COUNT = 23;
+        const VERTICAL_RADIUS = 11;
+        const PLANE_HEIGHT = FAR_Y - NEAR_Y;
+        const SVG_NS = "http://www.w3.org/2000/svg";
+
+        const ambientWash = document.getElementById("ambient-wash");
+        const grain = document.getElementById("grain");
+        const topPlane = document.getElementById("top-plane");
+        const bottomPlane = document.getElementById("bottom-plane");
+        const topRows = document.getElementById("top-rows");
+        const bottomRows = document.getElementById("bottom-rows");
+        const topVerticals = document.getElementById("top-verticals");
+        const bottomVerticals = document.getElementById("bottom-verticals");
+        const horizonTop = document.getElementById("horizon-top");
+        const horizonBottom = document.getElementById("horizon-bottom");
+
+        const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+        const mirrorY = (y) => CANVAS_HEIGHT - y;
+        const nearX = (index) => 960 + index * 154;
+        const farX = (index) => 960 + index * 76;
+
+        const project = (y) => {
+          const t = clamp((y - NEAR_Y) / PLANE_HEIGHT, 0, 1);
+          const left = -230 + t * 420;
+          const right = 2150 - t * 420;
+          return { left, right };
+        };
+
+        const makeLine = (attributes) => {
+          const line = document.createElementNS(SVG_NS, "line");
+          for (const [name, value] of Object.entries(attributes)) {
+            line.setAttribute(name, String(value));
+          }
+          return line;
+        };
+
+        const topRowLines = Array.from({ length: ROW_COUNT }, () =>
+          makeLine({ stroke: "rgba(37,50,72,0.30)", "stroke-width": 3.1, "stroke-linecap": "round" }),
+        );
+        const bottomRowLines = Array.from({ length: ROW_COUNT }, () =>
+          makeLine({ stroke: "rgba(37,50,72,0.30)", "stroke-width": 3.1, "stroke-linecap": "round" }),
+        );
+
+        topRowLines.forEach((line) => topRows.appendChild(line));
+        bottomRowLines.forEach((line) => bottomRows.appendChild(line));
+
+        Array.from({ length: VERTICAL_COUNT }, (_, position) => position - VERTICAL_RADIUS).forEach((index) => {
+          topVerticals.appendChild(
+            makeLine({
+              x1: nearX(index), y1: NEAR_Y, x2: farX(index), y2: FAR_Y,
+              stroke: "url(#grid-stroke)", "stroke-width": 2, "stroke-linecap": "round",
+            }),
+          );
+          bottomVerticals.appendChild(
+            makeLine({
+              x1: farX(index), y1: mirrorY(FAR_Y), x2: nearX(index), y2: mirrorY(NEAR_Y),
+              stroke: "url(#grid-stroke)", "stroke-width": 2, "stroke-linecap": "round",
+            }),
+          );
+        });
+
+        const setLine = (line, x1, y1, x2, y2) => {
+          line.setAttribute("x1", String(x1));
+          line.setAttribute("y1", String(y1));
+          line.setAttribute("x2", String(x2));
+          line.setAttribute("y2", String(y2));
+        };
+
+        const state = { seconds: 0 };
+
+        const renderFrame = () => {
+          const seconds = state.seconds;
+          const glow = 0.5 + Math.sin(seconds * 0.48) * 0.5;
+          const rowDrift = (seconds * ROW_SPEED) % ROW_STEP;
+          const rows = Array.from(
+            { length: ROW_COUNT },
+            (_, index) => NEAR_Y + ((index * ROW_STEP + rowDrift) % PLANE_HEIGHT),
+          );
+
+          rows.forEach((topY, index) => {
+            const projected = project(topY);
+            const bottomY = mirrorY(topY);
+            setLine(topRowLines[index], projected.left, topY, projected.right, topY);
+            setLine(bottomRowLines[index], projected.left, bottomY, projected.right, bottomY);
+          });
+
+          const planeOpacity = 0.72 + glow * 0.08;
+          topPlane.setAttribute("opacity", String(planeOpacity));
+          bottomPlane.setAttribute("opacity", String(planeOpacity));
+          horizonTop.style.opacity = String(0.32 + glow * 0.08);
+          horizonBottom.style.opacity = String(0.32 + glow * 0.08);
+          ambientWash.style.background = [
+            `radial-gradient(760px 520px at ${18 + Math.sin(seconds * 0.22) * 4}% ${8 + Math.cos(seconds * 0.18) * 3}%, rgba(47,111,255,0.10), transparent 66%)`,
+            `radial-gradient(720px 500px at ${84 + Math.cos(seconds * 0.2) * 4}% ${18 + Math.sin(seconds * 0.19) * 3}%, rgba(246,196,102,0.10), transparent 64%)`,
+            "linear-gradient(180deg, #fbfcf8 0%, #f2f6f8 46%, #fbfaf4 100%)",
+          ].join(", ");
+          grain.style.backgroundPosition = `${Math.round(seconds * 3) % 4}px ${Math.round(seconds * 2) % 4}px`;
+        };
+
+        renderFrame();
+        const timeline = gsap.timeline({ paused: true });
+        timeline.to(
+          state,
+          {
+            seconds: DURATION_SECONDS,
+            duration: DURATION_SECONDS,
+            ease: "none",
+            onUpdate: renderFrame,
+          },
+          0,
+        );
+        window.__timelines["studio-background"] = timeline;
+      })();
+    </script>
+  </div>
+</template>

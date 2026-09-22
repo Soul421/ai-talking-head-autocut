@@ -1,0 +1,7 @@
+interface:
+  display_name: "HyperFrames Scene Animator"
+  short_description: "先审核字幕驱动的全镜头静态页，再分工实现语义动效并闭环审片"
+  default_prompt: "Use $hyperframes-scene-animator to direct every subtitle-driven shot, obtain approval for the complete static-shot set, then delegate bounded scene implementation and finish proof through preview-v1."
+
+policy:
+  allow_implicit_invocation: true

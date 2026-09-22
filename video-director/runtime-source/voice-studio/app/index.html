@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>范铧屿本地声音工作室</title>
+  <style>
+    :root{color-scheme:light;--ink:#17212b;--muted:#66717e;--line:#dce2e8;--blue:#215fcb;--green:#19734a;--bg:#f5f7f9}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}
+    main{max-width:900px;margin:40px auto;padding:0 20px}header{margin-bottom:24px}h1{font-size:30px;margin:0 0 4px}p{margin:4px 0;color:var(--muted)}
+    .card{background:white;border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0;box-shadow:0 8px 30px rgba(30,50,70,.05)}
+    .status{display:flex;gap:10px;flex-wrap:wrap}.pill{padding:5px 10px;border-radius:999px;background:#edf2f7;font-size:13px}.ok{color:var(--green);background:#e7f6ee}
+    label{display:block;font-weight:600;margin:14px 0 6px}textarea,select,input{width:100%;font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px;background:white}textarea{min-height:150px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.cloud{padding:12px;background:#fff5df;border-radius:10px;margin-top:12px;display:none}.cloud input{width:auto;margin-right:8px}
+    button{border:0;border-radius:10px;padding:10px 15px;font:inherit;font-weight:600;cursor:pointer;background:var(--blue);color:white;margin:8px 8px 0 0}button.secondary{background:#edf2f7;color:var(--ink)}button.danger{background:#fff0f0;color:#a52828}button:disabled{opacity:.45;cursor:not-allowed}
+    .run{border-top:1px solid var(--line);padding:14px 0}.run:first-child{border-top:0}audio{width:100%;margin-top:8px}.small{font-size:13px}.error{color:#a52828;white-space:pre-wrap}.success{color:var(--green)}
+    @media(max-width:650px){main{margin:20px auto}.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body><main>
+  <header><h1>范铧屿本地声音工作室</h1><p>默认全程留在本机：Qwen3-TTS 配音，BaoCut 复核，节奏听审通过后才交给视频制作和 HeyGen。</p></header>
+  <section class="card"><div id="status" class="status">正在检查环境…</div></section>
+  <section class="card">
+    <label for="text">要说的话</label><textarea id="text" placeholder="把已经确认的口播稿粘贴到这里"></textarea>
+    <div class="row"><div><label for="engine">声音引擎</label><select id="engine"><option value="qwen-local">本地 Qwen3-TTS（默认）</option><option value="minimax-api">MiniMax API（备用）</option></select></div><div><label for="speed">语速</label><input id="speed" type="number" value="1.0" min="0.7" max="1.3" step="0.05"></div></div>
+    <div id="cloud" class="cloud"><label><input id="confirmCloud" type="checkbox">我确认文字会上传到 MiniMax，并可能产生 API 费用</label></div>
+    <button id="generate">生成配音</button><span id="busy" class="small"></span><div id="message"></div>
+  </section>
+  <section class="card"><h2>视频制作验收</h2><p>大画面与小窗分别保存裁切；字幕使用锁定 SRT 在最终合成时烧录。交付前检查实际 MP4 的开头、全部切换点、结尾，并播放放大的小窗检查嘴型。</p></section>
+  <section class="card"><h2>最近作品</h2><div id="runs">还没有作品。</div></section>
+</main><script>
+const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);let busy=false;
+async function api(path,data){const r=await fetch(path,{method:data?'POST':'GET',headers:{'Content-Type':'application/json'},body:data?JSON.stringify(data):undefined});const j=await r.json();if(!r.ok)throw new Error(j.error||'操作失败');return j}
+async function loadStatus(){const s=await api('/api/status');$('status').innerHTML=`<span class="pill ${s.local_ready?'ok':''}">本地 Qwen3-TTS：${s.local_ready?'可用':'需修复'}</span><span class="pill ${s.baocut_ready?'ok':''}">BaoCut：${s.baocut_ready?'可用':'需修复'}</span><span class="pill ${s.minimax_ready?'ok':''}">MiniMax 备用：${s.minimax_ready?'已开通':'未配置'}</span>`}
+async function loadRuns(){const rows=await api('/api/runs');$('runs').innerHTML=rows.length?rows.map(r=>`<div class="run"><b>${escapeHtml(r.text.slice(0,48))}${r.text.length>48?'…':''}</b><div class="small">${r.created_at} · ${r.engine==='qwen-local'?'本地 Qwen3-TTS':'MiniMax API'} · BaoCut ${r.qa_status} · ${r.rhythm_approved?'节奏已批准':r.approved?'旧版批准·待补节奏听审':'未批准'}</div><audio controls src="/media?job=${r.job_id}&name=voice.wav"></audio><div class="small"><label><input type="checkbox" style="width:auto" id="rhythm-${r.job_id}"> 我已听过本版：读音准确、停顿自然、重音合适、语速舒服、结尾完整</label></div><div><button class="secondary" onclick="action('qa','${r.job_id}')">BaoCut 本地验收</button><button class="secondary" onclick="action('approve','${r.job_id}')" ${r.qa_status!=='pass'?'disabled':''}>节奏听审后批准</button><button onclick="action('handoff','${r.job_id}')" ${!r.approved||!r.rhythm_approved?'disabled':''}>交给视频制作</button><button class="danger" onclick="deleteRun('${r.job_id}')">删除记录</button>${r.handoff_ready?`<a href="/media?job=${r.job_id}&name=video-handoff.json" target="_blank">查看交接单</a>`:''}</div></div>`).join(''):'还没有作品。'}
+async function deleteRun(job_id){if(busy)return;if(!confirm('确定删除这条记录？该作品的音频、字幕、验收和交接文件将一并删除，无法撤销。已经引用这些文件的视频项目可能无法继续使用它们。'))return;await action('delete',job_id)}
+async function action(name,job_id){if(busy)return;busy=true;$('message').textContent='正在处理…';try{await api('/api/'+name,{job_id,rhythm_reviewed:name==='approve'?$('rhythm-'+job_id).checked:undefined});$('message').className='success';$('message').textContent=name==='delete'?'记录及对应文件已删除。':name==='qa'?'BaoCut 验收完成。':name==='approve'?'已锁定这版声音。':'视频交接单已生成。';await loadRuns()}catch(e){$('message').className='error';$('message').textContent=e.message}finally{busy=false}}
+$('engine').onchange=()=>{$('cloud').style.display=$('engine').value==='minimax-api'?'block':'none'};
+$('generate').onclick=async()=>{if(busy)return;busy=true;$('busy').textContent='正在生成，请保持页面打开…';$('message').textContent='';try{await api('/api/generate',{text:$('text').value,speed:Number($('speed').value),engine:$('engine').value,confirm_cloud:$('confirmCloud').checked});$('message').className='success';$('message').textContent='声音已生成。请先试听，再运行 BaoCut 验收。';await loadRuns()}catch(e){$('message').className='error';$('message').textContent=e.message}finally{busy=false;$('busy').textContent=''}};
+loadStatus();loadRuns();
+</script></body></html>
