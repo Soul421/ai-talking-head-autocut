@@ -56,8 +56,69 @@ BAOCUT = Path(os.environ.get(
     _TTH.get("baocut_bin") or str(Path.home() / ".local/share/voice-studio/baocut/1.1.4/bcut"),
 ))
 TERMS_FILE = Path(_TTH.get("terms_file") or ROOT / "terms.txt")
+if not TERMS_FILE.is_file():
+    # optional glossary: missing file means empty dictionary, not a hard failure
+    TERMS_FILE = Path(os.environ.get("TTH_TERMS", str(ROOT / "terms.txt")))
 MINIMAX_HELPER = Path(__file__).with_name("minimax_generate.py")
 SCHEMA_VERSION = 1
+
+
+def load_terms() -> list[str]:
+    if not TERMS_FILE.is_file():
+        return []
+    try:
+        return [ln.strip() for ln in TERMS_FILE.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.startswith("#")]
+    except Exception:
+        return []
+
+
+def transcribe_reference(audio: Path) -> str:
+    """ASR the reference clip so ref_text always matches ref_audio.
+
+    Voice-cloning TTS treats (ref_audio, ref_text) as one worked example.
+    Mismatched transcript → loops/filler. Users should never hand-type this.
+    """
+    if not BAOCUT.exists() or not audio.is_file():
+        return ""
+    # copy into a scratch dir so we never touch a sibling .bcut next to the source
+    scratch = Path(tempfile.mkdtemp(prefix="ref-asr-"))
+    local_audio = scratch / audio.name
+    shutil.copy2(audio, local_audio)
+    result = subprocess.run(
+        [str(BAOCUT), "--json", "transcribe", str(local_audio),
+         "--model", "qwen3-asr-0.6b", "--source-lang", "zh", "--no-speakers", "--yes"],
+        capture_output=True, text=True, cwd=str(scratch),
+    )
+    blob = (result.stdout or "") + "\n" + (result.stderr or "")
+    if result.returncode != 0 and "transcript.json" not in blob:
+        return ""
+    try:
+        payload = extract_json(blob)
+        project = Path(payload.get("project") or "")
+        if not project.is_absolute():
+            project = scratch / project
+        transcript = project / "transcript.json"
+        if not transcript.is_file():
+            # bcut may write alongside the media
+            candidates = list(scratch.rglob("transcript.json"))
+            if candidates:
+                transcript = candidates[0]
+            else:
+                return ""
+        words = json.loads(transcript.read_text(encoding="utf-8")).get("words") or []
+        return "".join(w.get("text", "") for w in words).strip()
+    except Exception:
+        return ""
+
+
+def resolve_ref_text(configured: str, audio: Path) -> str:
+    """Prefer auto-ASR of the actual audio; fall back to configured text."""
+    if not audio.is_file():
+        return configured
+    spoken = transcribe_reference(audio)
+    if spoken and len(spoken) >= 8:
+        return spoken
+    return configured
 
 
 def now_iso() -> str:
@@ -218,6 +279,8 @@ class VoiceStudio:
             raise RuntimeError("本地声音环境不完整，请先运行状态检查")
 
         job_id, job_dir = self._new_job()
+        ref_text = REFERENCE_TEXT
+        ref_text_source = "config"
         request = {
             "schema_version": SCHEMA_VERSION,
             "job_id": job_id,
@@ -231,10 +294,16 @@ class VoiceStudio:
 
         started = time.monotonic()
         if engine == "qwen-local":
+            # ref_text MUST match ref_audio content; always re-derive from ASR
+            # so callers never need a hand-typed "exact" transcript.
+            ref_text = resolve_ref_text(REFERENCE_TEXT, REFERENCE_AUDIO)
+            if ref_text != REFERENCE_TEXT:
+                ref_text_source = "baocut-asr"
             command = [
                 str(QWEN_PYTHON), "-m", "mlx_audio.tts.generate",
                 "--model", str(QWEN_MODEL), "--text", text,
-                "--ref_audio", str(REFERENCE_AUDIO), "--ref_text", REFERENCE_TEXT,
+                "--ref_audio", str(REFERENCE_AUDIO), "--ref_text", ref_text,
+                "--lang_code", "zh", "--repetition_penalty", "1.2", "--max_tokens", "2048",
                 "--speed", str(speed), "--output_path", str(job_dir),
                 "--file_prefix", "voice", "--audio_format", "wav",
             ]
@@ -261,7 +330,12 @@ class VoiceStudio:
             **request,
             "generation_seconds": round(time.monotonic() - started, 3),
             "audio": {"path": str(output), "sha256": sha256(output), **audio_info(output)},
-            "reference": {"path": str(REFERENCE_AUDIO), "sha256": sha256(REFERENCE_AUDIO), "text": REFERENCE_TEXT},
+            "reference": {
+                "path": str(REFERENCE_AUDIO),
+                "sha256": sha256(REFERENCE_AUDIO),
+                "text": ref_text,
+                "text_source": ref_text_source,
+            },
             "model": {
                 "path": str(QWEN_MODEL) if engine == "qwen-local" else "MiniMax API",
                 "config_sha256": sha256(QWEN_MODEL / "config.json") if engine == "qwen-local" else None,
@@ -271,6 +345,11 @@ class VoiceStudio:
             "handoff": {"status": "blocked", "reason": "等待 BaoCut 验收和人工批准"},
         }
         atomic_json(job_dir / "manifest.json", manifest)
+        # freeze the artifact so preview players cannot rewrite it after hashing
+        try:
+            os.chmod(output, 0o444)
+        except OSError:
+            pass
         return manifest
 
     def qa(self, job_id: str) -> dict[str, Any]:
@@ -385,7 +464,7 @@ class VoiceStudio:
         if response.get("project") != str(project) or not project.is_dir():
             raise RuntimeError("BaoCut 没有返回预期的新项目路径")
         # CLI replacement preserves word timing; never edit transcript JSON directly.
-        for index, line in enumerate(TERMS_FILE.read_text(encoding="utf-8").splitlines()):
+        for index, line in enumerate(load_terms()):
             if not line.strip() or line.lstrip().startswith("#"):
                 continue
             canonical, variants = line.split("=", 1)

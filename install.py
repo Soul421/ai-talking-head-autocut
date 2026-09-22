@@ -144,6 +144,12 @@ def main() -> int:
                 continue
             name = RENAME.get(mod.name, mod.name)
             n1 += copy_tree(mod, target / name, args.speaker, args.reviewer, args.dry_run)
+            # bundle voice studio app into the skill so entrypoint works standalone
+            if name == "voice-studio":
+                app_src = PACK / "runtime-source" / "voice-studio" / "app"
+                if app_src.is_dir():
+                    n1 += copy_tree(app_src, target / "voice-studio" / "app",
+                                    args.speaker, args.reviewer, args.dry_run)
         print(f"  {n1} files")
         total += n1
 
