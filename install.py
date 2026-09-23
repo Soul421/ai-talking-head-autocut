@@ -15,6 +15,7 @@ import os
 import shutil
 import stat
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -68,7 +69,9 @@ def apply_subs(text: str, speaker: str, reviewer: str) -> str:
 def copy_tree(src: Path, dst: Path, speaker: str, reviewer: str, dry: bool) -> int:
     n = 0
     if dst.exists() and not dry:
-        shutil.rmtree(dst)
+        backup = dst.with_name(f"{dst.name}.backup-{time.strftime('%Y%m%d-%H%M%S')}")
+        shutil.move(str(dst), str(backup))
+        print(f"backup existing skill: {backup}")
     for p in src.rglob("*"):
         if any(part in SKIP_DIR_NAMES for part in p.relative_to(src).parts):
             continue
@@ -95,8 +98,8 @@ def copy_tree(src: Path, dst: Path, speaker: str, reviewer: str, dry: bool) -> i
     return n
 
 
-def write_config(target: Path, dry: bool) -> Path:
-    cfg_path = Path.home() / ".config" / "ai-talking-head-autocut" / "config.json"
+def write_config(target: Path | None, dry: bool) -> Path:
+    cfg_path = (target / "config.json") if target and target.suffix != ".json" else (target or Path.home() / ".config" / "ai-talking-head-autocut" / "config.json")
     example = json.loads((ROOT / "config.example.json").read_text(encoding="utf-8"))
     if cfg_path.exists():
         print(f"keep existing config: {cfg_path}")
@@ -116,6 +119,7 @@ def main() -> int:
     ap.add_argument("--speaker", default=os.environ.get("TTH_SPEAKER", "Speaker"))
     ap.add_argument("--reviewer", default=os.environ.get("TTH_REVIEWER", "Reviewer"))
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--config", default="", help="config.json path (default: ~/.config/ai-talking-head-autocut/config.json)")
     args = ap.parse_args()
 
     if not PACK.is_dir():
@@ -153,7 +157,8 @@ def main() -> int:
         print(f"  {n1} files")
         total += n1
 
-    write_config(Path.home() / ".config" / "ai-talking-head-autocut", args.dry_run)
+    cfg_path = Path(args.config).expanduser() if args.config else None
+    write_config(cfg_path or Path.home() / ".config" / "ai-talking-head-autocut", args.dry_run)
 
     print(f"""
 完成。下一步：

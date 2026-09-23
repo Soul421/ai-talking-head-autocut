@@ -42,7 +42,7 @@ cd ai-talking-head-autocut
 2. 生成 `~/.config/ai-talking-head-autocut/config.json`（路径、音色参考、批准人）
 3. 自动去掉作者本机绝对路径，把人名替换成你传入的 speaker/reviewer
 
-可选依赖（完整出片才需要）：Python 3.9+、Node.js、FFmpeg、BaoCut、本地 Qwen-TTS、HyperFrames 0.7.65、HeyGen 账号。
+可选依赖（完整出片才需要）：Python 3.9+、Node.js、FFmpeg、BaoCut、本地 Qwen-TTS、HyperFrames 0.7.65、HeyGen 账号。声音验收和 BaoCut 当前要求 macOS；Windows/Linux 可运行离线门禁和部分不依赖 BaoCut 的阶段。
 
 ## 30 秒最小可跑示例
 
@@ -53,7 +53,7 @@ python3 examples/mini-30s/run_minimal.py
 ```
 
 会锁定正文 hash → 生成 30s 时间轴字幕与占位音频 → 写出待审批准记录 → 产出 `video-handoff.json`。  
-配置好声音模型后，加 `--real-voice` 走真实 generate → 听审 → approve → handoff。
+配置好声音模型后，加 `--real-voice` 会真正调用 `voice-studio generate`；生成后仍必须人工听审，再按 `qa → approve → handoff` 继续，脚本不会替你批准。
 
 详见 [examples/mini-30s/README.md](examples/mini-30s/README.md)。
 

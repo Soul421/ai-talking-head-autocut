@@ -5,6 +5,7 @@
   python3 doctor.py              # 全量检查
   python3 doctor.py --stage s4   # 只查「出脸」阶段
   python3 doctor.py --json       # 机器可读
+  python3 doctor.py --next       # 显示当前最先要做的动作
 """
 
 from __future__ import annotations
@@ -99,7 +100,7 @@ def check_digital_human(cfg: dict) -> list[dict]:
     else:
         out.append(warn(
             "HeyGen: 无 API Key → 只能 PIP 占位或本地开源",
-            "设置 HEYGEN_API_KEY；或先把 --show-pip-placeholder 跑通",
+            "设置 HEYGEN_API_KEY；没有账号时先按路由表使用 PIP 占位",
         ))
     # 路由表必读
     routing = Path(__file__).resolve().parents[1] / "references" / "digital-human-routing.md"
@@ -119,6 +120,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", choices=["all", "s3", "s4", "s5", "s6"], default="all")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--next", action="store_true", help="显示第一条阻断项的具体下一步")
     args = ap.parse_args()
     cfg = load_config()
     results: list[dict] = []
@@ -148,6 +150,12 @@ def main() -> int:
         print(f"\n结论: {bad_n} 项阻断, {warn_n} 项警告。"
               + (" 可以进入下一阶段。" if bad_n == 0 else " 先解决 ✗ 再出脸/出片。"))
         print("路由表: video-director/references/digital-human-routing.md")
+        if args.next:
+            first = next((r for r in results if r.get("level") in {"bad", "warn"}), None)
+            if first:
+                print(f"\n下一步: {first['msg']}。{first.get('hint', '')}")
+            else:
+                print("\n下一步: 运行 voice-studio generate 开始第一条口播。")
     return 1 if any(r.get("level") == "bad" and args.stage != "all" for r in results) else 0
 
 

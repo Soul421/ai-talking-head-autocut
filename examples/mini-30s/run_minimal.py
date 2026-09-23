@@ -128,10 +128,26 @@ def main() -> int:
     # 2) audio
     audio_path = OUT / "audio.placeholder.wav"
     if args.real_voice:
-        log(glog, "GATE real-voice → voice-studio generate/qa（需配置）")
-        # Keep offline path deterministic here; real path is documented in README.
-        print("真实声音请按 README 调 voice-studio CLI；本脚本默认走离线门禁。", file=sys.stderr)
-        return 2
+        log(glog, "GATE real-voice → voice-studio generate（需已配置 TTS/BaoCut）")
+        cli = PACK / "video-director" / "skills" / "fanhuayu-voice-studio" / "scripts" / "voice_studio.py"
+        result = subprocess.run(
+            [sys.executable, str(cli), "generate", "--text", script],
+            text=True, capture_output=True, check=False,
+        )
+        if result.returncode != 0:
+            print(result.stderr or result.stdout or "voice-studio generate 失败", file=sys.stderr)
+            return result.returncode or 2
+        try:
+            manifest = json.loads(result.stdout)
+            generated = Path(manifest["audio"]["path"])
+        except (json.JSONDecodeError, KeyError, TypeError) as exc:
+            print(f"无法解析 voice-studio 输出：{exc}\n{result.stdout}", file=sys.stderr)
+            return 2
+        if not generated.is_file():
+            print(f"voice-studio 未生成音频：{generated}", file=sys.stderr)
+            return 2
+        audio_path = generated
+        log(glog, f"真实音频已生成：{audio_path}")
     make_placeholder_wav(audio_path, args.seconds)
     audio_hash = sha256_file(audio_path)
     log(glog, f"GATE audio-lock sha256={audio_hash[:12]}…  ({args.seconds:.0f}s placeholder)")
